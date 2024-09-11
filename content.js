@@ -53,11 +53,33 @@ function handleClick(event) {
 
 function getComputedStylesRecursive(element) {
   let styles = '';
-  const computedStyle = window.getComputedStyle(element);
-  
-  styles += `${element.tagName.toLowerCase()}${element.id ? '#' + element.id : ''} {
-    ${Array.from(computedStyle).map(key => `${key}: ${computedStyle.getPropertyValue(key)};`).join('\n')}
-  }\n`;
+
+  function getSpecifiedStyles(el) {
+    const computedStyles = getComputedStyle(el);
+    const tempElement = document.createElement(el.tagName);
+    document.body.appendChild(tempElement);
+    const defaultStyles = getComputedStyle(tempElement);
+    let specifiedStyles = {};
+
+    for (const prop in computedStyles) {
+      // Check if the property is specified in a stylesheet or different from default
+      if (el.style.getPropertyValue(prop) || computedStyles[prop] !== defaultStyles[prop]) {
+        const cssProperty = prop.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+        specifiedStyles[cssProperty] = computedStyles[prop];
+      }
+    }
+
+    document.body.removeChild(tempElement);
+
+    return specifiedStyles;
+  }
+
+  const specifiedStyles = getSpecifiedStyles(element);
+  if (Object.keys(specifiedStyles).length > 0) {
+    styles += `${element.tagName.toLowerCase()}${element.id ? '#' + element.id : ''} {
+      ${Object.entries(specifiedStyles).map(([key, value]) => `${key}: ${value};`).join('\n')}
+    }\n`;
+  }
   
   for (const child of element.children) {
     styles += getComputedStylesRecursive(child);
