@@ -26,7 +26,8 @@ This Chrome extension allows you to hover over elements on a web page, highlight
 
 5. To deactivate the tool, click the "Toggle Element Thief" button again in the popup.
 
-# TODO
+## TODO
+
 - [ ] Copy all the styles for every copied element
 - [ ] remove the red outline of the copied element
 - [ ] keep the popup open when clicking on an element
